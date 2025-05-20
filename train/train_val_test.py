@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import os
 import sys
 import torch
@@ -10,6 +11,14 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from dataset.graph_dataset_gen import MyDataset
 from model.Multi_GDNN import MGDPR
+=======
+import torch
+import csv as csv
+import torch.nn.functional as F
+import torch.distributions
+from graph_dataset_gen import MyDataset, MultiIndexDataset
+from Multi_GDNN import MGDPR
+>>>>>>> origin/main
 from sklearn.metrics import matthews_corrcoef, f1_score
 
 # Configure the device for running the model on GPU or CPU
@@ -36,6 +45,7 @@ for idx, path in enumerate(com_path):
         file = csv.reader(f)
         for line in file:
             com_list[idx].append(line[0])  # append first element of line if each line is a list
+<<<<<<< HEAD
 NYSE_com_list = [com for com in NYSE_com_list if com not in NYSE_missing_list]
 
 # Generate datasets
@@ -45,6 +55,20 @@ validation_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list,
                               val_sedate[0], val_sedate[1], 19, dataset_type[1])
 test_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list,
                          test_sedate[0], test_sedate[1], 19, dataset_type[2])
+=======
+NYSE_com_list = [com for com in NYSE_com_list if com not in NYSE_missing_list]
+
+# Path to the combined multi-index CSV file (ticker, date as indices)
+multi_csv_path = '/path/to/multiindex.csv'
+
+# Generate datasets using the MultiIndexDataset to avoid look-ahead bias
+train_dataset = MultiIndexDataset(multi_csv_path, des, NASDAQ_com_list,
+                                  sedate[0], sedate[1], 19, dataset_type[0])
+validation_dataset = MultiIndexDataset(multi_csv_path, des, NASDAQ_com_list,
+                                       val_sedate[0], val_sedate[1], 19, dataset_type[1])
+test_dataset = MultiIndexDataset(multi_csv_path, des, NASDAQ_com_list,
+                                 test_sedate[0], test_sedate[1], 19, dataset_type[2])
+>>>>>>> origin/main
 
 # Define model (these can be tuned)
 n = len(NASDAQ_com_list) # number of companies in NASDAQ
