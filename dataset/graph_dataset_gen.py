@@ -1,15 +1,11 @@
-from scipy.linalg import expm
 import torch
 import csv
 import os
 import numpy as np
-import random
-import sklearn.preprocessing as skp
 from torch.utils.data import Dataset
 import pandas as pd
 from datetime import datetime
 from typing import List, Tuple
-from functools import lru_cache
 from tqdm import tqdm
 import math
 
@@ -103,9 +99,14 @@ class MyDataset(Dataset):
         entropy = np.array([self.information_entropy(tuple(x)) for x in X])
         for i in range(X.shape[0]):
             for j in range(X.shape[0]):
-                A[i, j] = torch.tensor((energy[i] / energy[j]) * (math.exp(entropy[i] - entropy[j])), dtype=torch.float32)
-        
-        return torch.log(A[A<1] = 1)
+                A[i, j] = torch.tensor(
+                    (energy[i] / energy[j]) * (math.exp(entropy[i] - entropy[j])),
+                    dtype=torch.float32,
+                )
+
+        # Avoid values below one before applying logarithm
+        A[A < 1] = 1
+        return torch.log(A)
 
     def node_feature_matrix(self, dates: List[str], comlist: List[str], market: str, path: str) -> torch.Tensor:
         # Convert dates to datetime format for easier comparison

@@ -1,9 +1,15 @@
+import os
+import sys
 import torch
 import csv as csv
 import torch.nn.functional as F
 import torch.distributions
-from graph_dataset_gen import Mydataset
-from Multi_GDNN import MGDPR
+
+# Add repository root to Python path for module imports
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+from dataset.graph_dataset_gen import MyDataset
+from model.Multi_GDNN import MGDPR
 from sklearn.metrics import matthews_corrcoef, f1_score
 
 # Configure the device for running the model on GPU or CPU
@@ -33,9 +39,12 @@ for idx, path in enumerate(com_path):
 NYSE_com_list = [com for com in NYSE_com_list if com not in NYSE_missing_list]
 
 # Generate datasets
-train_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list, sedate[0], sedate[1], 19, dataset_type[0])
-validation_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list, sedate[0], sedate[1], 19, dataset_type[0])
-test_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list, sedate[0], sedate[1], 19, dataset_type[0])
+train_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list,
+                         sedate[0], sedate[1], 19, dataset_type[0])
+validation_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list,
+                              val_sedate[0], val_sedate[1], 19, dataset_type[1])
+test_dataset = MyDataset(directory, des, market[0], NASDAQ_com_list,
+                         test_sedate[0], test_sedate[1], 19, dataset_type[2])
 
 # Define model (these can be tuned)
 n = len(NASDAQ_com_list) # number of companies in NASDAQ
@@ -163,4 +172,4 @@ print(mcc / len(test_dataset))
 
 # save model to the directory
 if int(input('save model? (1/0)?')) == 1:
-    torch.save(model, dir_path() + 'your_dataset_name/model')
+    torch.save(model.state_dict(), 'trained_model.pth')
